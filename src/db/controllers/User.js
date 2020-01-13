@@ -1,4 +1,4 @@
-import User from '../models/User';
+import User from '../models/User'
 
 /**
  *
@@ -19,25 +19,24 @@ class UserMethod {
         })
 
         try {
-            const response = await user.save();
-
-            if(response) {
-                const token = response.generateToken();
-                const userObj = {...response._doc}
+            const response = await user.save()
+            if (response) {
+                const token = response.generateToken()
+                const userObj = { ...response._doc }
                 // delete the password
-                delete userObj.password;
-                
-                return userObj ? {...userObj, token} : {};
+                delete userObj.password
+                return userObj ? { ...userObj, token } : {}
             } else {
                 return {
-                    error: "An error occured."
+                    error: 'An error occured.'
                 }
             }
-            
         } catch (error) {
             console.log(error)
         }
     }
+
+
 
     /**
      * Gets a user by id
@@ -46,11 +45,10 @@ class UserMethod {
      */
     static async get(_id) {
         try {
-            const user = await User.findById({_id,});
-            const userObj = {...user._doc};
-            delete userObj.password;
+            const user = await User.findById({ _id })
+            const userObj = { ...user._doc }
+            delete userObj.password
             return userObj
-        
         } catch (error) {
             console.log(error)
             return {
@@ -59,23 +57,25 @@ class UserMethod {
         }
     }
 
+
+
     /**
-     * 
+     *
      * @param {object} userDetails the id of the user to get
      * @param {User} User returns the user
      */
-    static async signin({username, password}) {
+    static async signin({ username, password }) {
         try {
-            const user = await User.findOne({username,});
-            const authenticated = user.comparePassword(password);
+            const user = await User.findOne({ username })
+            const authenticated = user.comparePassword(password)
 
-            if(authenticated) {
+            if (authenticated) {
                 // generate token
-                const token = user.generateToken();
-                const userObj = {...user._doc};
+                const token = user.generateToken()
+                const userObj = { ...user._doc }
                 // delete password
-                delete userObj.password;
-                return {...userObj, token};
+                delete userObj.password
+                return { ...userObj, token }
             } else {
                 return {
                     error: 'Auth failed'
@@ -89,6 +89,8 @@ class UserMethod {
         }
     }
 
+    
+
     /**
      * Removes a user with the provided Id
      * @param {UserId} _id the id of the user to remove
@@ -97,12 +99,10 @@ class UserMethod {
     static async remove(_id) {
         try {
             const response = await User.findByIdAndDelete(_id)
-            response ? response : {}; 
+            response ? response : {}
         } catch (error) {
             console.log(e)
         }
-        
-        
     }
 }
 

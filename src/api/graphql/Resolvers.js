@@ -2,7 +2,10 @@ import UserMethod from '../../db/controllers/User';
 
 const resolvers = {
     Query: {
-        getUser: (_, {_id}) => UserMethod.get(_id)
+        getUser: (_, {_id}, context) =>{
+            if(!context.user) return {};
+            return UserMethod.get(_id)
+        }
     },
 
     Mutation: {
