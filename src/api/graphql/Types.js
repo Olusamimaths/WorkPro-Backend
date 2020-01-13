@@ -10,6 +10,33 @@ const typeDefs = gql`
         token: String
     }
 
+    type Task {
+        content: String
+        done: Boolean
+    }
+
+
+    type Stories {
+        title: String
+        type: String
+        points: Int
+        requester: String
+        owner: String
+        followers: [User]
+        description: String
+        labels: [String]
+        tasks: [Task]
+        category: String
+        finished: Boolean
+        delivered: Boolean
+    }
+
+    type Project {
+        id: ID
+        title: String
+        stories: [Stories]
+    }
+
     type Query {
         getUser(_id: ID): User
     }
