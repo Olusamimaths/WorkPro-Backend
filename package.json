@@ -1,0 +1,40 @@
+{
+  "name": "project-manager-backend",
+  "version": "1.0.0",
+  "description": "Backend for project manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node ./build/index.js",
+    "build": "babel -d build/ src",
+    "dev": "nodemon --exec npx babel-node src/index.js",
+    "prettier": "prettier --config ./.prettierrc --write \"**/*.js\"",
+    "pretest": "eslint --ignore-path .gitignore .",
+    "lint": "yarn prettier "
+  },
+  "author": "Olusola Samuel",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server-express": "^2.9.15",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "express": "^4.17.1",
+    "graphql": "^14.5.8",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.7.13",
+    "prettier": "^1.19.1",
+    "randomstring": "^1.1.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.7",
+    "@babel/node": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.0",
+    "nodemon": "^1.19.4"
+  }
+}
