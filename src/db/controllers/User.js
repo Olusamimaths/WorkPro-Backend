@@ -20,12 +20,20 @@ class UserMethod {
 
         try {
             const response = await user.save();
-            const userObj = {...response._doc}
 
-            // delete the password
-            delete userObj.password;
+            if(response) {
+                const token = response.generateToken();
+                const userObj = {...response._doc}
+                // delete the password
+                delete userObj.password;
+                
+                return userObj ? {...userObj, token} : {};
+            } else {
+                return {
+                    error: "An error occured."
+                }
+            }
             
-            return userObj ? userObj : {};
         } catch (error) {
             console.log(error)
         }
@@ -59,8 +67,6 @@ class UserMethod {
     static async signin({username, password}) {
         try {
             const user = await User.findOne({username,});
-            const hash = user.password;
-
             const authenticated = user.comparePassword(password);
 
             if(authenticated) {
