@@ -53,6 +53,36 @@ class UserMethod {
     }
 
     /**
+     * 
+     * @param {object} userDetails the id of the user to get
+     * @param {User} User returns the user
+     */
+    static async signin({username, password}) {
+        try {
+            const user = await User.findOne({username,});
+            const hash = user.password;
+
+            const authenticated = user.comparePassword(password, hash);
+            console.log(user)
+
+            if(authenticated) {
+                const userObj = {...user._doc};
+                delete userObj.password;
+                return userObj;
+            } else {
+                return {
+                    error: 'Auth failed'
+                }
+            }
+        } catch (error) {
+            console.log(error)
+            return {
+                error: 'User not found'
+            }
+        }
+    }
+
+    /**
      * Removes a user with the provided Id
      * @param {UserId} _id the id of the user to remove
      * @param {}
