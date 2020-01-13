@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import jwt from 'jsonwebtoken';
+import config from '../config/config';
+
+const env = process.env.NODE_ENV || "development";
+const { jwtsecret } = config[env];
 
 const { Schema } = mongoose;
 
@@ -23,6 +28,10 @@ UserSchema.pre("save", function(next){
 
 UserSchema.methods.comparePassword = function(plainPassword) {
   return bcrypt.compareSync(plainPassword, this.password);
+}
+
+UserSchema.methods.generateToken = function() {
+  return jwt.sign({id: this._id, username: this.username}, jwtsecret)
 }
 
 const User = mongoose.model("User", UserSchema);

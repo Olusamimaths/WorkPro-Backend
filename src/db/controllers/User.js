@@ -1,5 +1,4 @@
 import User from '../models/User';
-import mongoose from 'mongoose';
 
 /**
  *
@@ -62,13 +61,15 @@ class UserMethod {
             const user = await User.findOne({username,});
             const hash = user.password;
 
-            const authenticated = user.comparePassword(password, hash);
-            console.log(user)
+            const authenticated = user.comparePassword(password);
 
             if(authenticated) {
+                // generate token
+                const token = user.generateToken();
                 const userObj = {...user._doc};
+                // delete password
                 delete userObj.password;
-                return userObj;
+                return {...userObj, token};
             } else {
                 return {
                     error: 'Auth failed'
