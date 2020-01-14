@@ -15,7 +15,7 @@ class UserMethod {
         // check if user exists
         const foundUser = await User.findOne({email, })
 
-        if(foundUser) return {};
+        if(foundUser) return {status: 500, error: ['User not found']};
 
         const user = new User({
             password,
@@ -29,10 +29,11 @@ class UserMethod {
                 const userObj = { ...response._doc }
                 // delete the password
                 delete userObj.password
-                return userObj ? { ...userObj, token } : {}
+                return userObj ? { ...userObj, token, status: 200, error: [] } : {}
             } else {
                 return {
-                    error: 'An error occured.'
+                    status: 500,
+                    error: ['An error occured.']
                 }
             }
         } catch (error) {
@@ -52,15 +53,15 @@ class UserMethod {
             const user = await User.findById({ _id })
             const userObj = { ...user._doc }
             delete userObj.password
-            return userObj
+            return {...userObj, token, status: 200, error: []}
         } catch (error) {
             console.log(error)
             return {
-                error: 'User not found'
+                status: 404,
+                error: ['User not found']
             }
         }
     }
-
 
 
     /**
@@ -71,7 +72,7 @@ class UserMethod {
     static async signin({ email, password }) {
         try {
             const user = await User.findOne({ email })
-            if(!user) return {};
+            if(!user) return {status: 500, error: ['User not found']};
 
             // authenticate
             const authenticated = user.comparePassword(password)
@@ -81,16 +82,18 @@ class UserMethod {
                 const userObj = { ...user._doc }
                 // delete password
                 delete userObj.password
-                return { ...userObj, token }
+                return { ...userObj, token, status: 200, error: []}
             } else {
                 return {
-                    error: 'Auth failed'
+                    status: 500,
+                    error: ['Auth failed']
                 }
             }
         } catch (error) {
             console.log(error)
             return {
-                error: 'User not found'
+                status: 500, 
+                error: ['Internal sever error']
             }
         }
     }
