@@ -13,11 +13,9 @@ class UserMethod {
      */
     static async signup({password, email }) {
         // check if user exists
-        const foundUser = await User.find({email, })
+        const foundUser = await User.findOne({email, })
 
-        console.log(foundUser)
-
-        if(foundUser[0]) return {};
+        if(foundUser) return {};
 
         const user = new User({
             password,
@@ -70,11 +68,13 @@ class UserMethod {
      * @param {object} userDetails the id of the user to get
      * @param {User} User returns the user
      */
-    static async signin({ username, password }) {
+    static async signin({ email, password }) {
         try {
-            const user = await User.findOne({ username })
-            const authenticated = user.comparePassword(password)
+            const user = await User.findOne({ email })
+            if(!user) return {};
 
+            // authenticate
+            const authenticated = user.comparePassword(password)
             if (authenticated) {
                 // generate token
                 const token = user.generateToken()
