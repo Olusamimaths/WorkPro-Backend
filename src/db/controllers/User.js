@@ -11,9 +11,15 @@ class UserMethod {
      * @param {object} userDetails the details of the user to save
      * @returns {object} the saved user
      */
-    static async signup({ username, password, email }) {
+    static async signup({password, email }) {
+        // check if user exists
+        const foundUser = await User.find({email, })
+
+        console.log(foundUser)
+
+        if(foundUser[0]) return {};
+
         const user = new User({
-            username,
             password,
             email
         })
@@ -89,7 +95,7 @@ class UserMethod {
         }
     }
 
-    
+
 
     /**
      * Removes a user with the provided Id

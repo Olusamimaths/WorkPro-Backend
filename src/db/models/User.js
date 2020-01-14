@@ -9,7 +9,6 @@ const { jwtsecret } = config[env];
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-  username: String,
   email: String,
   password: String,
   role: String,

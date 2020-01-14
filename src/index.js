@@ -34,9 +34,16 @@ const server = new ApolloServer({
 
     if(!token) return {};
 
-    const user = jwt.verify(token, jwtsecret);
+    try {
+      const user = jwt.verify(token, jwtsecret);
 
-    return { user };
+      return { user };
+
+    } catch (error) {
+      return {}
+    }
+
+    
 
   }
 });

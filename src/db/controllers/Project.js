@@ -91,9 +91,7 @@ class ProjectMethod {
             project.stories = [...project.stories, story];
 
             const updatedProject = await project.save()
-            
-            console.log(updatedProject.stories)
-            return updatedProject;
+            return updatedProject ? updatedProject : {};
         } catch (error) {
             console.error("Error adding story: ", error)
         }

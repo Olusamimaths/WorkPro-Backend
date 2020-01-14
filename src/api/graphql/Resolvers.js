@@ -45,7 +45,7 @@ const resolvers = {
 
             const {createdBy} = await ProjectMethod.get(projectId);
 
-            if(createdBy != context.user._id) return {};
+            if(!context.user || createdBy != context.user._id) return {};
 
             return ProjectMethod.addStory({
                 projectId , 
