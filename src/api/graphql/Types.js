@@ -15,8 +15,7 @@ const typeDefs = gql`
         done: Boolean
     }
 
-
-    type Stories {
+    type Story {
         title: String
         type: String
         points: Int
@@ -34,16 +33,23 @@ const typeDefs = gql`
     type Project {
         id: ID
         title: String
-        stories: [Stories]
+        stories: [Story]
+        createdAt: String
+        createdBy: String
     }
 
     type Query {
         getUser(_id: ID): User
+        getProject(_id: ID): Project
+        getStories(_id: ID): [Story]
     }
 
     type Mutation {
         signup(username: String!, email: String!, password: String!): User,
         signin(username: String!, password: String!): User
+        createProject(title: String): Project
+        updateProject(title: String): Project
+        addStory(_id:ID, title: String): Story
     }
 `
 

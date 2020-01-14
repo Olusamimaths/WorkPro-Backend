@@ -31,7 +31,7 @@ UserSchema.methods.comparePassword = function(plainPassword) {
 }
 
 UserSchema.methods.generateToken = function() {
-  return jwt.sign({id: this._id, username: this.username}, jwtsecret)
+  return jwt.sign({_id: this._id, username: this.username}, jwtsecret)
 }
 
 const User = mongoose.model("User", UserSchema);
