@@ -1,11 +1,11 @@
-import Project from '../db/models/Project'
-import User from '../db/models/User'
-import Story from '../db/models/Story'
+import Project from '../db/models/ProjectModel'
+import User from '../db/models/UserModel'
+import Story from '../db/models/StoryModel'
 import Response from '../helpers/Response'
 
 /**
  *
- * class Project Methods
+ * class Project Method
  */
 class ProjectMethod {
     /**
@@ -75,7 +75,6 @@ class ProjectMethod {
                 user.projects = [...user.projects, projectId];
             }
             const updatedUser = await user.save();
-            console.log('user: ', user)
             if (!updatedProject || !updatedUser) {
                 return Response(
                     'Server error',
@@ -161,6 +160,10 @@ class ProjectMethod {
         }
     }
 
+    /**
+     * This section contains
+     * Internal methods that are not directly exposed to the user
+     */
     /**
      *
      * @param {ProjectId} _id

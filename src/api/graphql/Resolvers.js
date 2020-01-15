@@ -1,6 +1,5 @@
-import UserMethod from '../../controllers/User'
-import ProjectMethod from '../../controllers/Project'
-import Project from '../../db/models/Project'
+import UserMethod from '../../controllers/UserController'
+import ProjectMethod from '../../controllers/ProjectController'
 
 const resolvers = {
     Query: {

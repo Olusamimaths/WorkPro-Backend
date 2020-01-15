@@ -1,4 +1,4 @@
-import User from '../db/models/User'
+import User from '../db/models/UserModel'
 import Response from '../helpers/Response'
 
 /**
@@ -85,6 +85,10 @@ class UserMethod {
         }
     }
 
+    /**
+     * This section contains
+     * Internal methods that are not directly exposed to the user
+     */
     /**
      * Gets a user by id
      * @param {UserId} _id the id of the user to get
