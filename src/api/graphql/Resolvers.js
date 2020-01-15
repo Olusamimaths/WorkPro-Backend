@@ -1,6 +1,6 @@
 import UserMethod from '../../controllers/UserController'
 import ProjectMethod from '../../controllers/ProjectController'
-import CheckAuthorization from '../../helpers/CheckAuthorization';
+import isNotAuthenticated from '../../helpers/isNotAuthenticated';
 
 const resolvers = {
     Query: {
@@ -20,17 +20,25 @@ const resolvers = {
         signin: (_, args) => UserMethod.signin(args),
 
         createProject: (_, { title }, context) => {
-            // if not authenticated, return
-            if (!context.user) return {code: 500, status: "Auth failed", message: "You must be logged in."}
+            if(isNotAuthenticated(context)) return isNotAuthenticated(context);;
             const userId = context.user._id
             return ProjectMethod.create( title, userId)
         },
 
-        assignTo: async (_, { projectId, email }, context) => ProjectMethod.assignTo(projectId, email, context),
+        assignTo: (_, { projectId, email }, context) => {
+            if(isNotAuthenticated(context)) return isNotAuthenticated(context);
+            return ProjectMethod.assignTo(projectId, email, context);
+        },
 
-        updateProjectTitle: (_, { projectId, title }, context) => ProjectMethod.updateProjectTitle(projectId, title, context),
+        updateProjectTitle: (_, { projectId, title }, context) => {
+            if(isNotAuthenticated(context)) return isNotAuthenticated(context);;
+            return ProjectMethod.updateProjectTitle(projectId, title, context);
+        },
 
-        addStory: async (_, args, context) => ProjectMethod.addStory(args, context),
+        addStory: (_, args, context) => {
+            if(isNotAuthenticated(context)) return isNotAuthenticated(context);
+            return ProjectMethod.addStory(args, context);
+        },
     }
 }
 

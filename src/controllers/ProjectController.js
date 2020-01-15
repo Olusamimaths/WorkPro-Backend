@@ -2,8 +2,7 @@ import Project from '../db/models/ProjectModel'
 import User from '../db/models/UserModel'
 import Story from '../db/models/StoryModel'
 import Response from '../helpers/Response'
-import CheckAuthorization from '../helpers/CheckAuthorization'
-import { check } from 'prettier'
+import isNotAuthorized from '../helpers/isNotAuthorized'
 
 /**
  *
@@ -60,7 +59,7 @@ class ProjectMethod {
                 )
             }
 
-            CheckAuthorization(context, project.createdBy);
+            if(isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
 
             return Response('Updated', 201, 'Project Updated', project._doc)
         } catch (error) {}
@@ -81,7 +80,7 @@ class ProjectMethod {
             }
 
             // check authentication
-            CheckAuthorization(context, project.createdBy)
+            if(isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
 
             const user = await User.findOne({ email })
             if (!user) {
@@ -159,7 +158,7 @@ class ProjectMethod {
                 return Response('Not found', 404, 'Project could not be found')
             }
 
-            CheckAuthorization(context, project.createdBy)
+            if(isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
 
             project.stories = [...project.stories, story._id]
             const updatedProject = await project.save()
