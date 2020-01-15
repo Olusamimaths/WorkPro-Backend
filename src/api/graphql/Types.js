@@ -61,12 +61,13 @@ const typeDefs = gql`
     }
 
     type Mutation {
-        signup(email: String!, password: String!): User,
+        signup(email: String!, password: String!): User
         signin(email: String!, password: String!): User
         createProject(title: String): Project
-        updateProject(title: String): Project
+        updateProjectTitle(projectId: ID!, title: String!): Project
         assignTo(projectId: ID!, email: String!): Project
-        addStory(_id:ID!, title: String!, description: String!, 
+
+        addStory(projectId:ID!, title: String!, description: String!, 
             points: Int, owner: ID, labels: [String], tasks: [String],
             category: [String], finished: Boolean, delivered: Boolean
             ): Project

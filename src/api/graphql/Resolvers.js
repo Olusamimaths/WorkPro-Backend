@@ -1,5 +1,6 @@
 import UserMethod from '../../controllers/UserController'
 import ProjectMethod from '../../controllers/ProjectController'
+import CheckAuthorization from '../../helpers/CheckAuthorization';
 
 const resolvers = {
     Query: {
@@ -20,59 +21,16 @@ const resolvers = {
 
         createProject: (_, { title }, context) => {
             // if not authenticated, return
-            if (!context.user) return {}
+            if (!context.user) return {code: 500, status: "Auth failed", message: "You must be logged in."}
             const userId = context.user._id
-            return ProjectMethod.create({ title, userId })
+            return ProjectMethod.create( title, userId)
         },
 
-        assignTo: async (_, { projectId, email }, context) => {
-            const project = await ProjectMethod.get(projectId);
-            if (!project) return {message: "Project does not exist",status: "Not found", code: 404}
+        assignTo: async (_, { projectId, email }, context) => ProjectMethod.assignTo(projectId, email, context),
 
-            const { createdBy } = project
-            if (!context.user || createdBy != context.user._id || !createdBy)
-                return {code: 500, status: "Auth failed", message: "Project not found for user."}
-            
-            return ProjectMethod.assignTo({projectId, email});
-        },
+        updateProjectTitle: (_, { projectId, title }, context) => ProjectMethod.updateProjectTitle(projectId, title, context),
 
-        updateProject: (_, args, context) => {},
-
-        addStory: async (_, args, context) => {
-            const {
-                _id: projectId,
-                title,
-                description,
-                points,
-                owner,
-                followers,
-                labels,
-                tasks,
-                category,
-                finished,
-                delivered
-            } = args
-
-            const project = await ProjectMethod.get(projectId)
-            if (!project) return {}
-
-            const { createdBy } = project
-            if (!context.user || createdBy != context.user._id || !createdBy)
-                return {}
-            return ProjectMethod.addStory({
-                projectId,
-                title,
-                description,
-                points,
-                owner,
-                followers,
-                labels,
-                tasks,
-                category,
-                finished,
-                delivered
-            })
-        }
+        addStory: async (_, args, context) => ProjectMethod.addStory(args, context),
     }
 }
 

@@ -2,6 +2,8 @@ import Project from '../db/models/ProjectModel'
 import User from '../db/models/UserModel'
 import Story from '../db/models/StoryModel'
 import Response from '../helpers/Response'
+import CheckAuthorization from '../helpers/CheckAuthorization'
+import { check } from 'prettier'
 
 /**
  *
@@ -10,10 +12,10 @@ import Response from '../helpers/Response'
 class ProjectMethod {
     /**
      *
-     * @param {userDetails} object
-     * @returns {object}  new project
+     * @param {string} title the title of the project to create
+     * @param {string} userId the id of the user the project belongs to
      */
-    static async create({ title, userId }) {
+    static async create(title, userId) {
         const project = new Project({
             title,
             createdBy: userId
@@ -39,15 +41,17 @@ class ProjectMethod {
     }
 
     /**
-     * Assigns a project to a user
-     * @param {Object} param0 
+     *
+     * @param {String} projectId the project id to update
+     * @param {String} title the new title
      */
-    static async assignTo({projectId, email}) {
-        // find the project
+    static async updateProjectTitle(projectId, title, context) {
         try {
-            const project = await Project.findById({ _id: projectId })
-            const user = await User.findOne({ email })
-
+            const project = await Project.findByIdAndUpdate(
+                projectId,
+                { title },
+                { useFindAndModify: false }
+            )
             if (!project) {
                 return Response(
                     'Bad Request',
@@ -55,26 +59,47 @@ class ProjectMethod {
                     'Project could not be found'
                 )
             }
+
+            CheckAuthorization(context, project.createdBy);
+
+            return Response('Updated', 201, 'Project Updated', project._doc)
+        } catch (error) {}
+    }
+
+    /**
+     *
+     * @param {String} projectId the id of the project to be assigned
+     * @param {String} email the user to be assigned a project
+     */
+    static async assignTo(projectId, email, context) {
+        // find the project
+        try {
+            const project = await Project.findById({ _id: projectId })
+
+            if (!project) {
+                return Response('Not found', 404, 'Project could not be found')
+            }
+
+            // check authentication
+            CheckAuthorization(context, project.createdBy)
+
+            const user = await User.findOne({ email })
             if (!user) {
-                return Response(
-                    'Bad Request',
-                    400,
-                    'User could not be found'
-                )
+                return Response('Not found', 404, 'User could not be found')
             }
 
             // update the project
             //if not already assigned
-            if(!project.assignedTo.includes(user._id)) {
-                project.assignedTo = [...project.assignedTo, user._id];
+            if (!project.assignedTo.includes(user._id)) {
+                project.assignedTo = [...project.assignedTo, user._id]
             }
             const updatedProject = await project.save()
 
             // update the user
-            if(!user.projects.includes(projectId)) {
-                user.projects = [...user.projects, projectId];
+            if (!user.projects.includes(projectId)) {
+                user.projects = [...user.projects, projectId]
             }
-            const updatedUser = await user.save();
+            const updatedUser = await user.save()
             if (!updatedProject || !updatedUser) {
                 return Response(
                     'Server error',
@@ -89,11 +114,9 @@ class ProjectMethod {
                 'Project successfully assigned to user',
                 project._doc
             )
-
-
         } catch (error) {
             console.log('Could not assign to: ', error)
-        }       
+        }
     }
 
     /**
@@ -101,7 +124,7 @@ class ProjectMethod {
      * @param {Object} args
      * @returns ProjectObject
      */
-    static async addStory(args) {
+    static async addStory(args, context) {
         const {
             projectId,
             title,
@@ -133,16 +156,14 @@ class ProjectMethod {
         try {
             const project = await Project.findById({ _id: projectId })
             if (!project) {
-                return Response(
-                    'Bad Request',
-                    400,
-                    'Project could not be created'
-                )
+                return Response('Not found', 404, 'Project could not be found')
             }
-            project.stories = [...project.stories, story]
 
+            CheckAuthorization(context, project.createdBy)
+
+            project.stories = [...project.stories, story._id]
             const updatedProject = await project.save()
-            if (!project) {
+            if (!updatedProject) {
                 return Response(
                     'Bad Request',
                     400,

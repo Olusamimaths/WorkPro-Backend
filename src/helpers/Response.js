@@ -1,5 +1,5 @@
 /**
- * Class Response
+ * Function Response
  */
 
 /**

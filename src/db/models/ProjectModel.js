@@ -12,7 +12,7 @@ const ProjectSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    stories: [{}],
+    stories: [mongoose.ObjectId],
     createdBy: mongoose.ObjectId,
     assignedTo: [mongoose.ObjectId]
 })
