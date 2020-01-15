@@ -1,5 +1,5 @@
-import UserMethod from '../../db/controllers/User'
-import ProjectMethod from '../../db/controllers/Project'
+import UserMethod from '../../controllers/User'
+import ProjectMethod from '../../controllers/Project';
 
 const resolvers = {
     Query: {
@@ -43,10 +43,11 @@ const resolvers = {
                 delivered
             } = args;
 
-            const {createdBy} = await ProjectMethod.get(projectId);
+            const project = await ProjectMethod.get(projectId);
+            if(!project) return {};
 
-            if(!context.user || createdBy != context.user._id) return {};
-
+            const { createdBy } = project;
+            if(!context.user || createdBy != context.user._id || !createdBy) return {};
             return ProjectMethod.addStory({
                 projectId , 
                 title, 

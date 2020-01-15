@@ -7,15 +7,19 @@ const typeDefs = gql`
         role: String
         createdAt: String
         token: String
-        status: Int
-        error: [String]
+
+        status: String
+        code: Int
+        message: String
     }
 
     type Task {
         content: String
         done: Boolean
-        status: Int
-        error: [String]
+        
+        status: String
+        code: Int
+        message: String
     }
 
     type Story {
@@ -31,22 +35,27 @@ const typeDefs = gql`
         category: String
         finished: Boolean
         delivered: Boolean
-        status: Int
-        error: [String]
+        
+        status: String
+        code: Int
+        message: String
     }
 
     type Project {
-        id: ID
+        _id: ID
         title: String
         stories: [Story]
         createdAt: String
         createdBy: String
-        status: Int
-        error: [String]
+        pro: Query 
+        
+        status: String
+        code: Int
+        message: String
     }
 
     type Query {
-        getUser(_id: ID): User
+        getUser(_id: ID): User 
         getProject(_id: ID): Project
         getStories(_id: ID): [Story]
     }
