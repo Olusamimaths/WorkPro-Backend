@@ -1,4 +1,5 @@
 import Project from '../db/models/Project'
+import User from '../db/models/User'
 import Story from '../db/models/Story'
 import Response from '../helpers/Response'
 
@@ -7,35 +8,6 @@ import Response from '../helpers/Response'
  * class Project Methods
  */
 class ProjectMethod {
-    /**
-     *
-     * @param {ProjectId} _id
-     * @returns {ProjectObject} project
-     */
-    static async get(_id) {
-        try {
-            const project = await Project.findById({ _id })
-            return project ? project : {}
-        } catch (error) {
-            console.log('error: ', error)
-        }
-    }
-
-    /**
-     *
-     * @param {ProjectId} _id
-     * @returns {CreatorId} createdBy
-     */
-    static async getProjectCreator(_id) {
-        try {
-            const project = await ProjectMethod.get(_id)
-            const { createdBy } = project
-            return createdBy ? createdBy : ''
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     /**
      *
      * @param {userDetails} object
@@ -64,6 +36,65 @@ class ProjectMethod {
         } catch (error) {
             console.error(error)
         }
+    }
+
+    /**
+     * Assigns a project to a user
+     * @param {Object} param0 
+     */
+    static async assignTo({projectId, email}) {
+        // find the project
+        try {
+            const project = await Project.findById({ _id: projectId })
+            const user = await User.findOne({ email })
+
+            if (!project) {
+                return Response(
+                    'Bad Request',
+                    400,
+                    'Project could not be found'
+                )
+            }
+            if (!user) {
+                return Response(
+                    'Bad Request',
+                    400,
+                    'User could not be found'
+                )
+            }
+
+            // update the project
+            //if not already assigned
+            if(!project.assignedTo.includes(user._id)) {
+                project.assignedTo = [...project.assignedTo, user._id];
+            }
+            const updatedProject = await project.save()
+
+            // update the user
+            if(!user.projects.includes(projectId)) {
+                user.projects = [...user.projects, projectId];
+            }
+            const updatedUser = await user.save();
+            console.log('user: ', user)
+            if (!updatedProject || !updatedUser) {
+                return Response(
+                    'Server error',
+                    500,
+                    'Project could not be assigned to user.'
+                )
+            }
+
+            return Response(
+                'Assigned',
+                201,
+                'Project successfully assigned to user',
+                project._doc
+            )
+
+
+        } catch (error) {
+            console.log('Could not assign to: ', error)
+        }       
     }
 
     /**
@@ -127,6 +158,35 @@ class ProjectMethod {
             )
         } catch (error) {
             console.error('Error adding story: ', error)
+        }
+    }
+
+    /**
+     *
+     * @param {ProjectId} _id
+     * @returns {ProjectObject} project
+     */
+    static async get(_id) {
+        try {
+            const project = await Project.findById({ _id })
+            return project ? project : {}
+        } catch (error) {
+            console.log('error: ', error)
+        }
+    }
+
+    /**
+     *
+     * @param {ProjectId} _id
+     * @returns {CreatorId} createdBy
+     */
+    static async getProjectCreator(_id) {
+        try {
+            const project = await ProjectMethod.get(_id)
+            const { createdBy } = project
+            return createdBy ? createdBy : ''
+        } catch (error) {
+            console.log(error)
         }
     }
 }

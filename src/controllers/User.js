@@ -35,7 +35,7 @@ class UserMethod {
                 const userObj = { ...savedUser._doc, token }
                 // delete the password
                 delete userObj.password
-                return Response('Created', 201, 'User accout created', userObj)
+                return Response('Created', 201, 'User account created', userObj)
             } else {
                 return Response(
                     'Bad Request',

@@ -18,6 +18,7 @@ const UserSchema = new Schema({
   },
   emailConfirmedAt: Date,
   emailConfirmCode: String,
+  projects: [mongoose.ObjectId]
 });
 
 UserSchema.pre("save", function(next){

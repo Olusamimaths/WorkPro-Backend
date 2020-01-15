@@ -65,6 +65,7 @@ const typeDefs = gql`
         signin(email: String!, password: String!): User
         createProject(title: String): Project
         updateProject(title: String): Project
+        assignTo(projectId: ID!, email: String!): Project
         addStory(_id:ID!, title: String!, description: String!, 
             points: Int, owner: ID, labels: [String], tasks: [String],
             category: [String], finished: Boolean, delivered: Boolean

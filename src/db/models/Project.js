@@ -13,7 +13,8 @@ const ProjectSchema = new Schema({
         default: Date.now
     },
     stories: [{}],
-    createdBy: mongoose.ObjectId
+    createdBy: mongoose.ObjectId,
+    assignedTo: [mongoose.ObjectId]
 })
 
 const Project = mongoose.model('Project', ProjectSchema)

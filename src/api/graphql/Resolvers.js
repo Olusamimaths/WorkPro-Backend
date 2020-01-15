@@ -1,5 +1,6 @@
 import UserMethod from '../../controllers/User'
-import ProjectMethod from '../../controllers/Project';
+import ProjectMethod from '../../controllers/Project'
+import Project from '../../db/models/Project'
 
 const resolvers = {
     Query: {
@@ -25,15 +26,25 @@ const resolvers = {
             return ProjectMethod.create({ title, userId })
         },
 
+        assignTo: async (_, { projectId, email }, context) => {
+            const project = await ProjectMethod.get(projectId);
+            if (!project) return {message: "Project does not exist",status: "Not found", code: 404}
+
+            const { createdBy } = project
+            if (!context.user || createdBy != context.user._id || !createdBy)
+                return {code: 500, status: "Auth failed", message: "Project not found for user."}
+            
+            return ProjectMethod.assignTo({projectId, email});
+        },
+
         updateProject: (_, args, context) => {},
 
         addStory: async (_, args, context) => {
-
             const {
-                _id : projectId, 
-                title, 
-                description, 
-                points, 
+                _id: projectId,
+                title,
+                description,
+                points,
                 owner,
                 followers,
                 labels,
@@ -41,18 +52,19 @@ const resolvers = {
                 category,
                 finished,
                 delivered
-            } = args;
+            } = args
 
-            const project = await ProjectMethod.get(projectId);
-            if(!project) return {};
+            const project = await ProjectMethod.get(projectId)
+            if (!project) return {}
 
-            const { createdBy } = project;
-            if(!context.user || createdBy != context.user._id || !createdBy) return {};
+            const { createdBy } = project
+            if (!context.user || createdBy != context.user._id || !createdBy)
+                return {}
             return ProjectMethod.addStory({
-                projectId , 
-                title, 
-                description, 
-                points, 
+                projectId,
+                title,
+                description,
+                points,
                 owner,
                 followers,
                 labels,
