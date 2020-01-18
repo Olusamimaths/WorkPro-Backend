@@ -1,6 +1,6 @@
 import UserMethod from '../../controllers/UserController'
 import ProjectMethod from '../../controllers/ProjectController'
-import isNotAuthenticated from '../../helpers/isNotAuthenticated';
+import isNotAuthenticated from '../../helpers/isNotAuthenticated'
 
 const resolvers = {
     Query: {
@@ -20,25 +20,26 @@ const resolvers = {
         signin: (_, args) => UserMethod.signin(args),
 
         createProject: (_, { title }, context) => {
-            if(isNotAuthenticated(context)) return isNotAuthenticated(context);;
+            if (isNotAuthenticated(context)) return isNotAuthenticated(context)
             const userId = context.user._id
-            return ProjectMethod.create( title, userId)
+            return ProjectMethod.create(title, userId)
         },
-
         assignTo: (_, { projectId, email }, context) => {
-            if(isNotAuthenticated(context)) return isNotAuthenticated(context);
-            return ProjectMethod.assignTo(projectId, email, context);
+            if (isNotAuthenticated(context)) return isNotAuthenticated(context)
+            return ProjectMethod.assignTo(projectId, email, context)
         },
-
         updateProjectTitle: (_, { projectId, title }, context) => {
-            if(isNotAuthenticated(context)) return isNotAuthenticated(context);;
-            return ProjectMethod.updateProjectTitle(projectId, title, context);
+            if (isNotAuthenticated(context)) return isNotAuthenticated(context)
+            return ProjectMethod.updateProjectTitle(projectId, title, context)
         },
-
         addStory: (_, args, context) => {
-            if(isNotAuthenticated(context)) return isNotAuthenticated(context);
-            return ProjectMethod.addStory(args, context);
+            if (isNotAuthenticated(context)) return isNotAuthenticated(context)
+            return ProjectMethod.addStory(args, context)
         },
+        updateStory: (_, args, context) => {
+            if (isNotAuthenticated(context)) return isNotAuthenticated(context);
+            return ProjectMethod.updateStory(args, context)
+        }
     }
 }
 

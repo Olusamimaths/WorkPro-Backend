@@ -71,6 +71,9 @@ const typeDefs = gql`
             points: Int, owner: ID, labels: [String], tasks: [String],
             category: [String], finished: Boolean, delivered: Boolean
             ): Project
+        updateStory(storyId:ID!, title: String!, description: String!, 
+            points: Int, owner: ID, labels: [String], tasks: [String],
+            category: [String], finished: Boolean, delivered: Boolean) : Story
     }
 `
 

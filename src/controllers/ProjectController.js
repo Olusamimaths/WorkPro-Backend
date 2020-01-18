@@ -31,7 +31,7 @@ class ProjectMethod {
             return Response(
                 'Created',
                 201,
-                'Project Created',
+                'Project Successfully Created',
                 savedProject._doc
             )
         } catch (error) {
@@ -46,11 +46,8 @@ class ProjectMethod {
      */
     static async updateProjectTitle(projectId, title, context) {
         try {
-            const project = await Project.findByIdAndUpdate(
-                projectId,
-                { title },
-                { useFindAndModify: false }
-            )
+            const project  = await Project.findById({ _id: projectId })
+
             if (!project) {
                 return Response(
                     'Bad Request',
@@ -59,10 +56,25 @@ class ProjectMethod {
                 )
             }
 
-            if(isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
+            if (isNotAuthorized(context, project.createdBy))
+                return isNotAuthorized(context, project.createdBy)
+            project.title = title;
+            const updatedProject = await project.save();
 
-            return Response('Updated', 201, 'Project Updated', project._doc)
-        } catch (error) {}
+            if (!updatedProject) {
+                return Response(
+                    'Internal Server Error',
+                    500,
+                    'Error occured while updating project'
+                )
+            }
+            return Response(
+                'Updated',
+                201,
+                'Project title successfully updated',
+                updatedProject._doc
+            )
+        } catch (error) { console.log('Error while updating project title: ', error)}
     }
 
     /**
@@ -80,7 +92,8 @@ class ProjectMethod {
             }
 
             // check authentication
-            if(isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
+            if (isNotAuthorized(context, project.createdBy))
+                return isNotAuthorized(context, project.createdBy)
 
             const user = await User.findOne({ email })
             if (!user) {
@@ -101,7 +114,7 @@ class ProjectMethod {
             const updatedUser = await user.save()
             if (!updatedProject || !updatedUser) {
                 return Response(
-                    'Server error',
+                    'Internal Server Error',
                     500,
                     'Project could not be assigned to user.'
                 )
@@ -114,7 +127,7 @@ class ProjectMethod {
                 project._doc
             )
         } catch (error) {
-            console.log('Could not assign to: ', error)
+            console.log('Could not assign  project to user: ', error)
         }
     }
 
@@ -138,45 +151,90 @@ class ProjectMethod {
             delivered
         } = args
 
-        const story = new Story({
-            title,
-            description,
-            points,
-            owner,
-            followers,
-            labels,
-            tasks,
-            category,
-            finished,
-            delivered,
-            projectId
-        })
-
         try {
             const project = await Project.findById({ _id: projectId })
             if (!project) {
                 return Response('Not found', 404, 'Project could not be found')
             }
+            if (isNotAuthorized(context, project.createdBy))
+                return isNotAuthorized(context, project.createdBy)
 
-            if(isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
+            const story = new Story({
+                title,
+                description,
+                points,
+                owner,
+                followers,
+                labels,
+                tasks,
+                category,
+                finished,
+                delivered,
+                projectId
+            })
 
             project.stories = [...project.stories, story._id]
             const updatedProject = await project.save()
             if (!updatedProject) {
                 return Response(
-                    'Bad Request',
-                    400,
-                    'Story could not be added to project'
+                    'Internal Server Error',
+                    500,
+                    'An error occured while trying to add story to project.'
                 )
             }
             return Response(
-                'Created',
+                'Added',
                 201,
-                'Project Created',
+                'Story successfully added to the project',
                 updatedProject._doc
             )
         } catch (error) {
             console.error('Error adding story: ', error)
+        }
+    }
+
+    static async updateStory(args, storyId, context) {
+        try {
+            // checkAuthorization
+            if (isNotAuthorized(context, project.createdBy))
+                return isNotAuthorized(context, project.createdBy)
+            const story = await Story.findById({ _id: storyId })
+            if (!story) {
+                return Response('Not found', 404, 'Story could not be found')
+            }
+
+            const keys = Object.keys(args)
+            const providedKeys = keys.filter(key => Boolean(key))
+            if (providedKeys.length <= 0)
+                return Response(
+                    'Bad Request',
+                    500,
+                    'You most provide at least one value to be updated'
+                )
+            // copy the provided values to a new object
+            let update = {}
+            keys.forEach(key => (update[key] = args[key]))
+
+            const story = await Story.findByIdAndUpdate(
+                storyId,
+                { ...update },
+                { useFindAndModify: false }
+            )
+            if (!story) {
+                return Response(
+                    'Internal Server Error',
+                    500,
+                    'An error occured while trying to update story.'
+                )
+            }
+            return Response(
+                'Updated',
+                201,
+                'Story successfully updated',
+                story._doc
+            )
+        } catch (error) {
+            console.log('Error while updating story: ', error)
         }
     }
 

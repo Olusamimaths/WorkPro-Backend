@@ -1,6 +1,6 @@
 import Response from './Response';
 /**
- * Function CheckAuth
+ * Function isNotAuthenticated
  */
 
 
