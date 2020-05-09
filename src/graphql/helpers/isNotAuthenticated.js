@@ -5,8 +5,7 @@ import Response from './Response';
 
 
 /**
- * This helper function verifies if its the owner of a story
- * or project that is trying to modify it
+ * This helper function verifies if a user is signed in
  * @param {Object} context the context for the current request
  * @param {String} creatorId the id of the creator of the project or story
  */

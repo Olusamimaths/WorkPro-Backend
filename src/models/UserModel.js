@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken';
-import config from '../config/config';
+import config from '../../config';
 
-const env = process.env.NODE_ENV || "development";
-const { jwtsecret } = config[env];
-
+const { jwtsecret } = config;
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -31,7 +29,7 @@ UserSchema.methods.comparePassword = function(plainPassword) {
 }
 
 UserSchema.methods.generateToken = function() {
-  return jwt.sign({_id: this._id, username: this.username}, jwtsecret)
+  return jwt.sign({_id: this._id, username: this.username}, jwtsecret, {expiresIn: '24h'})
 }
 
 const User = mongoose.model("User", UserSchema);

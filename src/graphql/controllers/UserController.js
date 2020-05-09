@@ -1,4 +1,4 @@
-import User from '../db/models/UserModel'
+import User from '../../models/UserModel'
 import Response from '../helpers/Response'
 
 /**
@@ -8,11 +8,11 @@ import Response from '../helpers/Response'
 
 class UserMethod {
     /**
-     *
-     * @param {object} userDetails the details of the user to save
-     * @returns {object} the saved user
+     * 
+     * @param {string} email the user email
+     * @param {string} password the user password
      */
-    static async signup({ password, email }) {
+    static async signup(email, password) {
         // check if user exists
         const foundUser = await User.findOne({ email })
 
@@ -49,11 +49,11 @@ class UserMethod {
     }
 
     /**
-     *
-     * @param {object} userDetails the id of the user to get
-     * @param {User} User returns the user
+     * 
+     * @param {string} email the user email
+     * @param {string} password the user password
      */
-    static async signin({ email, password }) {
+    static async signin(email, password) {
         try {
             const user = await User.findOne({ email })
             if (!user) return Response('Not found', 404, 'User not found.')
