@@ -1,80 +1,97 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
-    type User {
-        _id: ID
-        email: String
-        role: String
-        createdAt: String
-        token: String
+  type User {
+    _id: ID
+    email: String
+    role: String
+    createdAt: String
+    token: String
 
-        status: String
-        code: Int
-        message: String
-    }
+    status: String
+    code: Int
+    message: String
+  }
 
-    type Task {
-        content: String
-        done: Boolean
-        
-        status: String
-        code: Int
-        message: String
-    }
+  type Task {
+    content: String
+    done: Boolean
 
-    type Story {
-        title: String
-        type: String
-        points: Int
-        requester: String
-        owner: String
-        followers: [User]
-        description: String
-        labels: [String]
-        tasks: [Task]
-        category: String
-        finished: Boolean
-        delivered: Boolean
-        
-        status: String
-        code: Int
-        message: String
-    }
+    status: String
+    code: Int
+    message: String
+  }
 
-    type Project {
-        _id: ID
-        title: String
-        stories: [Story]
-        createdAt: String
-        createdBy: String
-        pro: Query 
-        
-        status: String
-        code: Int
-        message: String
-    }
+  type Story {
+    title: String
+    type: String
+    points: Int
+    requester: String
+    owner: String
+    followers: [User]
+    description: String
+    labels: [String]
+    tasks: [Task]
+    category: String
+    finished: Boolean
+    delivered: Boolean
 
-    type Query {
-        getUser(_id: ID): User 
-        getProject(_id: ID): Project
-        getStories(_id: ID): [Story]
-    }
+    status: String
+    code: Int
+    message: String
+  }
 
-    type Mutation {
-        signup(email: String!, password: String!): User
-        signin(email: String!, password: String!): User
-        createProject(title: String): Project
-        updateProjectTitle(projectId: ID!, title: String!): Project
-        assignTo(projectId: ID!, email: String!): Project
+  type Project {
+    _id: ID
+    title: String
+    stories: [Story]
+    createdAt: String
+    createdBy: String
+    pro: Query
 
-        addStory(projectId:ID!, title: String!, description: String!, 
-            points: Int, owner: ID, labels: [String], tasks: [String],
-            category: [String], finished: Boolean, delivered: Boolean
-            ): Project
-        updateStory(storyId:ID!, title: String!, description: String!, 
-            points: Int, owner: ID, labels: [String], tasks: [String],
-            category: [String], finished: Boolean, delivered: Boolean) : Story
-    }
-`
+    status: String
+    code: Int
+    message: String
+  }
+
+  type Query {
+    getUser(_id: ID): User
+    getProject(_id: ID): Project
+    getStories(_id: ID): [Story]
+  }
+
+  type Mutation {
+    signup(email: String!, password: String!): User
+    signin(email: String!, password: String!): User
+    createProject(title: String): Project
+    updateProjectTitle(projectId: ID!, title: String!): Project
+    assignTo(projectId: ID!, email: String!): Project
+
+    addStory(
+      projectId: ID!
+      title: String!
+      description: String!
+      points: Int
+      owner: ID
+      labels: [String]
+      tasks: [String]
+      category: [String]
+      finished: Boolean
+      delivered: Boolean
+    ): Project
+    updateStory(
+      storyId: ID!
+      title: String!
+      description: String!
+      points: Int
+      owner: ID
+      labels: [String]
+      tasks: [String]
+      category: [String]
+      finished: Boolean
+      delivered: Boolean
+    ): Story
+  }
+`;
 
 export default typeDefs;

@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from '../../config';
 
@@ -16,22 +16,22 @@ const UserSchema = new Schema({
   },
   emailConfirmedAt: Date,
   emailConfirmCode: String,
-  projects: [mongoose.ObjectId]
+  projects: [mongoose.ObjectId],
 });
 
-UserSchema.pre("save", function(next){
+UserSchema.pre('save', function (next) {
   this.password = bcrypt.hashSync(this.password);
-  next()
+  next();
 });
 
-UserSchema.methods.comparePassword = function(plainPassword) {
+UserSchema.methods.comparePassword = function (plainPassword) {
   return bcrypt.compareSync(plainPassword, this.password);
-}
+};
 
-UserSchema.methods.generateToken = function() {
-  return jwt.sign({_id: this._id, username: this.username}, jwtsecret, {expiresIn: '24h'})
-}
+UserSchema.methods.generateToken = function () {
+  return jwt.sign({ _id: this._id, username: this.username }, jwtsecret, { expiresIn: '24h' });
+};
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model('User', UserSchema);
 
 export default User;

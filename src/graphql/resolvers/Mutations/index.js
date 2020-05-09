@@ -1,5 +1,5 @@
-import UserMutations from './UserMutations'
+import UserMutations from './UserMutations';
 
 export default {
-    ...UserMutations,
-}
+  ...UserMutations,
+};

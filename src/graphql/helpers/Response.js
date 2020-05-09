@@ -9,8 +9,6 @@
  * @param {string} message response description
  * @param {object} data  response data object
  */
-const Response = (status, code, message, data) => {
-    return { status, code, message, ...data}
-}
+const Response = (status, code, message, data) => ({ status, code, message, ...data });
 
 export default Response;

@@ -1,2 +1,2 @@
-const config = require(`./${process.env.NODE_ENV || 'development'}`); 
-module.exports = config;
+const config = require(`./${process.env.NODE_ENV || 'development'}`);
+export default config;

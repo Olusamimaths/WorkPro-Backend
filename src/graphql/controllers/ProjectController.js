@@ -5,6 +5,7 @@ import Response from '../helpers/Response';
 import isNotAuthorized from '../helpers/isNotAuthorized';
 import isNotAuthenticated from '../helpers/isNotAuthenticated';
 import isNotValidMongooseId from '../helpers/isNotValidMongooseId';
+import CustomResponses from '../helpers/CustomResponses';
 
 /**
  *
@@ -17,7 +18,7 @@ class ProjectMethod {
    * @param {string} userId the id of the user the project belongs to
    */
   static async create(title, context) {
-    if (isNotAuthenticated(context)) return isNotAuthenticated(context);
+    if (isNotAuthenticated(context)) return CustomResponses.invalidId;
 
     const project = new Project({
       title,
@@ -40,17 +41,16 @@ class ProjectMethod {
    * @param {String} title the new title
    */
   static async updateProjectTitle(projectId, title, context) {
-    if (isNotValidMongooseId(projectId)) return isNotValidMongooseId(projectId);
-    if (isNotAuthenticated(context)) return isNotAuthenticated(context);
+    if (isNotValidMongooseId(projectId)) return CustomResponses.invalidId;
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
       const project = await Project.findById({ _id: projectId });
-      console.log(project)
 
       if (!project) {
         return Response('Bad Request', 400, 'Project could not be found');
       }
 
-      if (isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
 
       project.title = title;
       const updatedProject = await project.save();
@@ -70,8 +70,8 @@ class ProjectMethod {
    * @param {String} email the user to be assigned a project
    */
   static async assignTo(projectId, email, context) {
-    if (isNotValidMongooseId(projectId)) return isNotValidMongooseId(projectId);
-    if (isNotAuthenticated(context)) return isNotAuthenticated(context);
+    if (isNotValidMongooseId(projectId)) return CustomResponses.invalidId;
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     // find the project
     try {
       const project = await Project.findById({ _id: projectId });
@@ -81,7 +81,7 @@ class ProjectMethod {
       }
 
       // check authentication
-      if (isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
 
       const user = await User.findOne({ email });
       if (!user) {
@@ -89,7 +89,7 @@ class ProjectMethod {
       }
 
       // update the project
-      //if not already assigned
+      // if not already assigned
       if (!project.assignedTo.includes(user._id)) {
         project.assignedTo = [...project.assignedTo, user._id];
       }
@@ -116,7 +116,7 @@ class ProjectMethod {
    * @returns ProjectObject
    */
   static async addStory(args, context) {
-    if (isNotAuthenticated(context)) return isNotAuthenticated(context);
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     const {
       projectId,
       title,
@@ -130,14 +130,14 @@ class ProjectMethod {
       finished,
       delivered,
     } = args;
-    if (isNotValidMongooseId(projectId)) return isNotValidMongooseId(projectId);
 
+    if (isNotValidMongooseId(projectId)) return CustomResponses.invalidId;
     try {
       const project = await Project.findById({ _id: projectId });
       if (!project) {
         return Response('Not found', 404, 'Project could not be found');
       }
-      if (isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
 
       const story = new Story({
         title,
@@ -171,11 +171,11 @@ class ProjectMethod {
    * @param {object} context the current context
    */
   static async updateStory(args, storyId, context) {
-    if (isNotValidMongooseId(storyId)) return isNotValidMongooseId(storyId);
-    if (isNotAuthenticated(context)) return isNotAuthenticated(context);
+    if (isNotValidMongooseId(projectId)) return CustomResponses.invalidId;
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
       // checkAuthorization
-      if (isNotAuthorized(context, project.createdBy)) return isNotAuthorized(context, project.createdBy);
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
       const story = await Story.findById({ _id: storyId });
       if (!story) {
         return Response('Not found', 404, 'Story could not be found');
@@ -183,10 +183,9 @@ class ProjectMethod {
 
       const keys = Object.keys(args);
       const providedKeys = keys.filter(key => Boolean(key));
-      if (providedKeys.length <= 0)
-        return Response('Bad Request', 500, 'You most provide at least one value to be updated');
+      if (providedKeys.length <= 0) { return Response('Bad Request', 500, 'You most provide at least one value to be updated'); }
       // copy the provided values to a new object
-      let update = {};
+      const update = {};
       keys.forEach(key => (update[key] = args[key]));
 
       const updatedStory = await Story.findByIdAndUpdate(storyId, { ...update }, { useFindAndModify: false });
@@ -211,7 +210,7 @@ class ProjectMethod {
   static async get(_id) {
     try {
       const project = await Project.findById({ _id });
-      return project ? project : {};
+      return project || {};
     } catch (error) {
       console.log('error: ', error);
     }
@@ -226,7 +225,7 @@ class ProjectMethod {
     try {
       const project = await ProjectMethod.get(_id);
       const { createdBy } = project;
-      return createdBy ? createdBy : '';
+      return createdBy || '';
     } catch (error) {
       console.log(error);
     }

@@ -1,10 +1,10 @@
-import mongoose from 'mongoose'
-import config from '../config'
+import mongoose from 'mongoose';
+import config from '../config';
 
-const { host, db_port, database } = config;
+const { host, dbPort, database } = config;
 
-const db =  mongoose
-  .connect(`mongodb://${host}:${db_port}/${database}`, {
+const db = mongoose
+  .connect(`mongodb://${host}:${dbPort}/${database}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
