@@ -19,16 +19,16 @@ const UserSchema = new Schema({
   projects: [mongoose.ObjectId],
 });
 
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', function hashPassword(next) {
   this.password = bcrypt.hashSync(this.password);
   next();
 });
 
-UserSchema.methods.comparePassword = function (plainPassword) {
+UserSchema.methods.comparePassword = function passwordComparer(plainPassword) {
   return bcrypt.compareSync(plainPassword, this.password);
 };
 
-UserSchema.methods.generateToken = function () {
+UserSchema.methods.generateToken = function tokenGenerator() {
   return jwt.sign({ _id: this._id, username: this.username }, jwtsecret, { expiresIn: '24h' });
 };
 

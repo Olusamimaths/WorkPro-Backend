@@ -33,6 +33,7 @@ class ProjectMethod {
     } catch (error) {
       console.error(error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -62,6 +63,7 @@ class ProjectMethod {
     } catch (error) {
       console.log('Error while updating project title: ', error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -108,6 +110,7 @@ class ProjectMethod {
     } catch (error) {
       console.log('Could not assign  project to user: ', error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -162,6 +165,7 @@ class ProjectMethod {
     } catch (error) {
       console.error('Error adding story: ', error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -171,22 +175,24 @@ class ProjectMethod {
    * @param {object} context the current context
    */
   static async updateStory(args, storyId, context) {
-    if (isNotValidMongooseId(projectId)) return CustomResponses.invalidId;
+    if (isNotValidMongooseId(storyId)) return CustomResponses.invalidId;
     if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
       // checkAuthorization
-      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
       const story = await Story.findById({ _id: storyId });
       if (!story) {
         return Response('Not found', 404, 'Story could not be found');
       }
+      if (isNotAuthorized(context, story.owner)) return CustomResponses.notAuthorized;
 
       const keys = Object.keys(args);
       const providedKeys = keys.filter(key => Boolean(key));
-      if (providedKeys.length <= 0) { return Response('Bad Request', 500, 'You most provide at least one value to be updated'); }
+      if (providedKeys.length <= 0) {
+        return Response('Bad Request', 500, 'You most provide at least one value to be updated');
+      }
       // copy the provided values to a new object
       const update = {};
-      keys.forEach(key => (update[key] = args[key]));
+      keys.forEach(key => { update[key] = args[key]; });
 
       const updatedStory = await Story.findByIdAndUpdate(storyId, { ...update }, { useFindAndModify: false });
       if (!updatedStory) {
@@ -196,6 +202,8 @@ class ProjectMethod {
     } catch (error) {
       console.log('Error while updating story: ', error);
     }
+
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -214,6 +222,7 @@ class ProjectMethod {
     } catch (error) {
       console.log('error: ', error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -229,6 +238,7 @@ class ProjectMethod {
     } catch (error) {
       console.log(error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 }
 

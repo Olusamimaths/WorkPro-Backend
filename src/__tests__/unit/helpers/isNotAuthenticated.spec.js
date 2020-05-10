@@ -1,10 +1,10 @@
-import isNotAuthenticated from '../../../graphql/helpers/isNotAuthenticated'
+/* eslint-disable no-undef */
+import isNotAuthenticated from '../../../graphql/helpers/isNotAuthenticated';
 
-const context = {}
-context.user = {}
+const context = {};
+context.user = {};
 
 describe('The isNotAuthenticated helper function', () => {
-
   it('returns true if the context has no user object', () => {
     expect(isNotAuthenticated({})).toBe(true);
   });
@@ -12,5 +12,4 @@ describe('The isNotAuthenticated helper function', () => {
   it('returns false if the context has a user object', () => {
     expect(isNotAuthenticated(context)).toBe(false);
   });
-
 });

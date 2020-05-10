@@ -36,6 +36,7 @@ class UserMethod {
     } catch (error) {
       console.log(error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -79,7 +80,7 @@ class UserMethod {
       const user = await User.findById({ _id });
       const userObj = { ...user._doc };
       delete userObj.password;
-      return { ...userObj, token, status: 200, error: [] };
+      return { ...userObj, status: 200, error: [] };
     } catch (error) {
       console.log(error);
       return {};

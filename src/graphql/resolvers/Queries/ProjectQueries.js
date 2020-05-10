@@ -1,3 +1,5 @@
+import ProjectMethod from '../../controllers/ProjectController';
+
 const ProjectQueries = {
   getProject: (_, { _id }, context) => {},
 
