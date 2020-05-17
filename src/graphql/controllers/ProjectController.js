@@ -18,7 +18,7 @@ class ProjectMethod {
    * @param {string} userId the id of the user the project belongs to
    */
   static async create(title, context) {
-    if (isNotAuthenticated(context)) return CustomResponses.invalidId;
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
 
     const project = new Project({
       title,
@@ -178,7 +178,6 @@ class ProjectMethod {
     if (isNotValidMongooseId(storyId)) return CustomResponses.invalidId;
     if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
-      // checkAuthorization
       const story = await Story.findById({ _id: storyId });
       if (!story) {
         return Response('Not found', 404, 'Story could not be found');
@@ -207,18 +206,43 @@ class ProjectMethod {
   }
 
   /**
-   * This section contains
-   * Internal methods that are not directly exposed to the user
+   *
+   * @param {string} storyId the id of the story to update
+   * @param {object} context the current context
+   * @returns {story object}
    */
+  static async getStory(storyId, context) {
+    if (isNotValidMongooseId(storyId)) return CustomResponses.invalidId;
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
+    try {
+      const story = await Story.findById({ _id: storyId });
+      if (!story) {
+        return Response('Not found', 404, 'Story could not be found');
+      }
+      if (isNotAuthorized(context, story.owner)) return CustomResponses.notAuthorized;
+
+      return Response('Story found', 201, 'Story successfully found.', story._doc);
+    } catch (error) {
+      console.log('Error while getting story: ', error);
+    }
+
+    return Response('Internal Server Error', 500, 'Something went wrong.');
+  }
+
   /**
    *
    * @param {ProjectId} _id
    * @returns {ProjectObject} project
    */
-  static async get(_id) {
+  static async getProject(_id, context) {
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
       const project = await Project.findById({ _id });
-      return project || {};
+      if (!project) {
+        return Response('Not found', 404, 'Project could not be found');
+      }
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
+      return Response('Project found', 200, 'Project successfully found.', project._doc);
     } catch (error) {
       console.log('error: ', error);
     }
@@ -230,9 +254,11 @@ class ProjectMethod {
    * @param {ProjectId} _id
    * @returns {CreatorId} createdBy
    */
-  static async getProjectCreator(_id) {
+  static async getProjectCreator(_id, context) {
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
       const project = await ProjectMethod.get(_id);
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
       const { createdBy } = project;
       return createdBy || '';
     } catch (error) {

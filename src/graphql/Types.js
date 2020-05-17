@@ -35,6 +35,7 @@ const typeDefs = gql`
     category: String
     finished: Boolean
     delivered: Boolean
+    projectId: ID
 
     status: String
     code: Int
@@ -44,7 +45,7 @@ const typeDefs = gql`
   type Project {
     _id: ID
     title: String
-    stories: [Story]
+    stories: [ID]
     createdAt: String
     createdBy: String
     pro: Query
@@ -58,6 +59,7 @@ const typeDefs = gql`
     getUser(_id: ID): User
     getProject(_id: ID): Project
     getStories(_id: ID): [Story]
+    getStory(_id: ID): Story
   }
 
   type Mutation {

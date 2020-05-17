@@ -1,5 +1,9 @@
 import User from '../../models/UserModel';
 import Response from '../helpers/Response';
+import isNotAuthenticated from '../helpers/isNotAuthenticated';
+import CustomResponses from '../helpers/CustomResponses';
+
+
 
 /**
  *
@@ -75,7 +79,8 @@ class UserMethod {
    * @param {UserId} _id the id of the user to get
    * @param {User} User returns the user
    */
-  static async get(_id) {
+  static async get(_id, context) {
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
       const user = await User.findById({ _id });
       const userObj = { ...user._doc };
