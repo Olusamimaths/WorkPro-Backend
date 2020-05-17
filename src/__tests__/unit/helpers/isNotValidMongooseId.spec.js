@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import mongoose from 'mongoose';
 import isNotValidMongooseId from '../../../graphql/helpers/isNotValidMongooseId';
 
@@ -12,5 +13,5 @@ describe('The isNotValidMongooseId helper function', () => {
 
   it('returns true for an invalid id which is not an ObjectId type', () => {
     expect(isNotValidMongooseId('13433dfkkfd')).toBe(true);
-  })
+  });
 });

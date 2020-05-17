@@ -17,7 +17,9 @@
       "object-curly-newline": "off",
       "arrow-parens": [2, "as-needed"],
       "import/prefer-default-export": "off",
-      "max-len": ["error", { "code": 120 }]
+      "max-len": ["error", { "code": 120 }],
+      "no-underscore-dangle": ["error", { "allow": ["_id", "_doc"] }],
+      "no-console": ["error", { "allow": ["warn", "error", "log"] }]
     }
   }
   

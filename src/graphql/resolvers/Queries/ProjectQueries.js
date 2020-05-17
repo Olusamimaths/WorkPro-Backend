@@ -1,7 +1,9 @@
-const ProjectQueries = {
-  getProject: (_, { _id }, context) => {},
+import ProjectMethod from '../../controllers/ProjectController';
 
-  getStories: (_, { _id }, context) => {},
+const ProjectQueries = {
+  getProject: (_, { _id }, context) => ProjectMethod.getProject(_id, context),
+
+  getStory: (_, { _id }, context) => ProjectMethod.getStory(_id, context),
 };
 
 module.exports = ProjectQueries;

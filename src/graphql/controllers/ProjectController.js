@@ -18,7 +18,7 @@ class ProjectMethod {
    * @param {string} userId the id of the user the project belongs to
    */
   static async create(title, context) {
-    if (isNotAuthenticated(context)) return CustomResponses.invalidId;
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
 
     const project = new Project({
       title,
@@ -33,6 +33,7 @@ class ProjectMethod {
     } catch (error) {
       console.error(error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -62,6 +63,7 @@ class ProjectMethod {
     } catch (error) {
       console.log('Error while updating project title: ', error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -108,6 +110,7 @@ class ProjectMethod {
     } catch (error) {
       console.log('Could not assign  project to user: ', error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -162,6 +165,7 @@ class ProjectMethod {
     } catch (error) {
       console.error('Error adding story: ', error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -171,22 +175,23 @@ class ProjectMethod {
    * @param {object} context the current context
    */
   static async updateStory(args, storyId, context) {
-    if (isNotValidMongooseId(projectId)) return CustomResponses.invalidId;
+    if (isNotValidMongooseId(storyId)) return CustomResponses.invalidId;
     if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
-      // checkAuthorization
-      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
       const story = await Story.findById({ _id: storyId });
       if (!story) {
         return Response('Not found', 404, 'Story could not be found');
       }
+      if (isNotAuthorized(context, story.owner)) return CustomResponses.notAuthorized;
 
       const keys = Object.keys(args);
       const providedKeys = keys.filter(key => Boolean(key));
-      if (providedKeys.length <= 0) { return Response('Bad Request', 500, 'You most provide at least one value to be updated'); }
+      if (providedKeys.length <= 0) {
+        return Response('Bad Request', 500, 'You most provide at least one value to be updated');
+      }
       // copy the provided values to a new object
       const update = {};
-      keys.forEach(key => (update[key] = args[key]));
+      keys.forEach(key => { update[key] = args[key]; });
 
       const updatedStory = await Story.findByIdAndUpdate(storyId, { ...update }, { useFindAndModify: false });
       if (!updatedStory) {
@@ -196,24 +201,52 @@ class ProjectMethod {
     } catch (error) {
       console.log('Error while updating story: ', error);
     }
+
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
-   * This section contains
-   * Internal methods that are not directly exposed to the user
+   *
+   * @param {string} storyId the id of the story to update
+   * @param {object} context the current context
+   * @returns {story object}
    */
+  static async getStory(storyId, context) {
+    if (isNotValidMongooseId(storyId)) return CustomResponses.invalidId;
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
+    try {
+      const story = await Story.findById({ _id: storyId });
+      if (!story) {
+        return Response('Not found', 404, 'Story could not be found');
+      }
+      if (isNotAuthorized(context, story.owner)) return CustomResponses.notAuthorized;
+
+      return Response('Story found', 201, 'Story successfully found.', story._doc);
+    } catch (error) {
+      console.log('Error while getting story: ', error);
+    }
+
+    return Response('Internal Server Error', 500, 'Something went wrong.');
+  }
+
   /**
    *
    * @param {ProjectId} _id
    * @returns {ProjectObject} project
    */
-  static async get(_id) {
+  static async getProject(_id, context) {
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
       const project = await Project.findById({ _id });
-      return project || {};
+      if (!project) {
+        return Response('Not found', 404, 'Project could not be found');
+      }
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
+      return Response('Project found', 200, 'Project successfully found.', project._doc);
     } catch (error) {
       console.log('error: ', error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 
   /**
@@ -221,14 +254,17 @@ class ProjectMethod {
    * @param {ProjectId} _id
    * @returns {CreatorId} createdBy
    */
-  static async getProjectCreator(_id) {
+  static async getProjectCreator(_id, context) {
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
       const project = await ProjectMethod.get(_id);
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
       const { createdBy } = project;
       return createdBy || '';
     } catch (error) {
       console.log(error);
     }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
   }
 }
 

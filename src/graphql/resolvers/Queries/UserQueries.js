@@ -1,8 +1,7 @@
+import UserMethod from '../../controllers/UserController';
+
 const UserQueries = {
-  getUser: (_, { _id }, context) => {
-    if (!context.user) return {};
-    return UserMethod.get(_id);
-  },
+  getUser: (_, { _id }, context) => UserMethod.get(_id, context),
 };
 
 module.exports = UserQueries;

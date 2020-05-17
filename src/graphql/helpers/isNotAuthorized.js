@@ -9,6 +9,7 @@
  * @param {String} creatorId the id of the creator of the project or story
  */
 const isNotAuthorized = (context, creatorId) => {
+  // eslint-disable-next-line eqeqeq
   if (!(context.user && context.user._id == creatorId)) return true;
   return false;
 };
