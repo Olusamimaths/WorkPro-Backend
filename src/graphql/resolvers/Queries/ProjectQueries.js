@@ -6,4 +6,4 @@ const ProjectQueries = {
   getStory: (_, { _id }, context) => ProjectMethod.getStory(_id, context),
 };
 
-module.exports = ProjectQueries;
+export default ProjectQueries;

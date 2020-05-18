@@ -15,6 +15,8 @@ const UserMutations = {
   addStory: (_, args, context) => ProjectMethod.addStory(args, context),
 
   updateStory: (_, args, context) => ProjectMethod.updateStory(args, context),
+
+  deleteProject: (_, { _id }, context) => ProjectMethod.deleteProject(_id, context),
 };
 
-module.exports = UserMutations;
+export default UserMutations;
