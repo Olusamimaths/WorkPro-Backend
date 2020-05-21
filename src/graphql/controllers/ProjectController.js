@@ -191,7 +191,9 @@ class ProjectMethod {
       }
       // copy the provided values to a new object
       const update = {};
-      keys.forEach(key => { update[key] = args[key]; });
+      keys.forEach(key => {
+        update[key] = args[key];
+      });
 
       const updatedStory = await Story.findByIdAndUpdate(storyId, { ...update }, { useFindAndModify: false });
       if (!updatedStory) {
@@ -257,10 +259,35 @@ class ProjectMethod {
   static async getProjectCreator(_id, context) {
     if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
     try {
-      const project = await ProjectMethod.get(_id);
+      const project = await Project.findById({ _id });
+      if (!project) {
+        return Response('Not found', 404, 'Project could not be found');
+      }
       if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
       const { createdBy } = project;
       return createdBy || '';
+    } catch (error) {
+      console.log(error);
+    }
+    return Response('Internal Server Error', 500, 'Something went wrong.');
+  }
+
+  /**
+   *
+   * @param {ProjectId} _id
+   * @returns {context} current user context
+   */
+  static async deleteProject(_id, context) {
+    if (isNotAuthenticated(context)) return CustomResponses.notAuthenticated;
+    try {
+      const project = await Project.findById({ _id });
+      if (!project) {
+        return Response('Not found', 404, 'Project could not be found');
+      }
+      if (isNotAuthorized(context, project.createdBy)) return CustomResponses.notAuthorized;
+      const deleted = await Project.deleteOne({ _id });
+      if (deleted.ok) return Response('Deleted', 202, 'Project successfully deleted.', {});
+      return Response('Conflict', 409, 'There was an error processing your request.', {});
     } catch (error) {
       console.log(error);
     }

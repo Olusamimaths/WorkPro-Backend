@@ -11,8 +11,8 @@ An api for a Project Manager application with the following user stories:
 - A user can update a story they added to a project ✅ 
 - A user can get a story by Id ✅ 
 - A user can get a project by Id ✅ 
-- A user can delete a project ❌  
-- A user can and task to a project ❌  
+- A user can delete a project they created ✅   
+- A user can add tasks to a project ❌  
 - A user can mark a story as completed ❌  
 - A user can mark a story as delivered ❌  
 

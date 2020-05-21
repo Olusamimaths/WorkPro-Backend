@@ -4,4 +4,4 @@ const UserQueries = {
   getUser: (_, { _id }, context) => UserMethod.get(_id, context),
 };
 
-module.exports = UserQueries;
+export default UserQueries;
